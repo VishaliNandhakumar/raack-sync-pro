@@ -1,8 +1,9 @@
+import os  # ADD THIS LINE AT THE TOP
+
 from flask import Flask, render_template, request, jsonify, send_file, send_from_directory
 from flask_cors import CORS
 import pandas as pd
 import zipfile
-import os
 import io
 import tempfile
 from datetime import datetime
@@ -18,10 +19,15 @@ app = Flask(__name__)
 CORS(app)
 
 # ===============================
-# UPLOAD CONFIG
+# ADD THIS FOR PYTHONANYWHERE
 # ===============================
-UPLOAD_FOLDER = 'temp_uploads'
-ZIP_FOLDER = 'temp_zips'
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# ===============================
+# UPLOAD CONFIG - MODIFIED FOR PYTHONANYWHERE
+# ===============================
+UPLOAD_FOLDER = os.path.join(BASE_DIR, 'temp_uploads')  # CHANGED
+ZIP_FOLDER = os.path.join(BASE_DIR, 'temp_zips')  # CHANGED
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(ZIP_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
@@ -61,9 +67,9 @@ SHEET_IDS = {
 }
 
 # ===============================
-# SERVICE ACCOUNT
+# SERVICE ACCOUNT - MODIFIED FOR PYTHONANYWHERE
 # ===============================
-SERVICE_ACCOUNT_FILE = "credentials/service_account.json"
+SERVICE_ACCOUNT_FILE = os.path.join(BASE_DIR, "credentials/service_account.json")  # CHANGED
 
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -808,8 +814,6 @@ def cleanup():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# ===============================
-# RUN
-# ===============================
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
