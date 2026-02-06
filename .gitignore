@@ -1,0 +1,24 @@
+# Virtual environment
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Credentials & secrets
+credentials/
+.env
+
+# Uploaded & generated files
+uploads/
+processed_reports/
+temp_uploads/
+temp_zips/
+
+# Excel temp files
+*.xlsx
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.vscode/

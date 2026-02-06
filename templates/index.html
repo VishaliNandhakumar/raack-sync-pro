@@ -1,0 +1,1494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DataSync Pro | Google Sheets Uploader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --merron-black: #0a0a0a;
+            --merron-dark: #1a1a1a;
+            --merron-gray: #2a2a2a;
+            --merron-light-gray: #e5e7eb;
+            --merron-red: #dc2626;
+            --merron-dark-red: #b91c1c;
+            --merron-white: #ffffff;
+            --merron-off-white: #f8fafc;
+            --merron-text: #1f2937;
+            --merron-text-light: #6b7280;
+            --merron-accent: #ef4444;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 14px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--merron-white);
+            color: var(--merron-text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2.5rem;
+            background: linear-gradient(135deg, var(--merron-white) 0%, var(--merron-off-white) 100%);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--merron-light-gray);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--merron-red) 0%, var(--merron-accent) 50%, var(--merron-red) 100%);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            background: linear-gradient(135deg, var(--merron-red) 0%, var(--merron-dark-red) 100%);
+            color: var(--merron-white);
+            width: 70px;
+            height: 70px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            transform: rotate(-5deg);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.2);
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
+
+        h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--merron-red) 0%, var(--merron-dark-red) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: var(--merron-text-light);
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--merron-white);
+            padding: 2rem;
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--merron-light-gray);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--merron-red);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--merron-red) 0%, var(--merron-accent) 50%, var(--merron-red) 100%);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--merron-red);
+            margin-bottom: 0.5rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--merron-text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        @media (max-width: 968px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--merron-white);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--merron-light-gray);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+
+        .card:hover {
+            border-color: var(--merron-red);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-3px);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--merron-red) 0%, var(--merron-accent) 100%);
+        }
+
+        .card-header {
+            padding: 1.75rem;
+            background: var(--merron-off-white);
+            border-bottom: 1px solid var(--merron-light-gray);
+        }
+
+        .card-header h2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--merron-text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-header h2 i {
+            color: var(--merron-red);
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--merron-light-gray);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--merron-off-white);
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--merron-red);
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--merron-red);
+            background: rgba(220, 38, 38, 0.1);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 3.5rem;
+            color: var(--merron-red);
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 4px 8px rgba(220, 38, 38, 0.2));
+        }
+
+        .upload-text {
+            font-size: 1.1rem;
+            color: var(--merron-text);
+            margin-bottom: 1rem;
+        }
+
+        .upload-text strong {
+            color: var(--merron-red);
+            font-weight: 700;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.85rem 1.75rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--merron-red) 0%, var(--merron-dark-red) 100%);
+            color: var(--merron-white);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--merron-white);
+            color: var(--merron-text);
+            border: 1px solid var(--merron-light-gray);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--merron-red);
+            color: var(--merron-red);
+        }
+
+        .btn-danger {
+            background: var(--merron-white);
+            color: var(--merron-text);
+            border: 1px solid var(--merron-light-gray);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #fef2f2;
+            border-color: var(--merron-red);
+            color: var(--merron-red);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* File Info */
+        .file-info {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--merron-red);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .file-info h4 {
+            margin-bottom: 1rem;
+            color: var(--merron-text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .file-info p {
+            color: var(--merron-text-light);
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .file-info strong {
+            color: var(--merron-text);
+            min-width: 120px;
+            font-weight: 600;
+        }
+
+        /* Connection Status */
+        .connection-status {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--merron-off-white);
+            border-radius: var(--radius);
+            border: 1px solid var(--merron-light-gray);
+        }
+
+        .status-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .status-dot.connected {
+            background: var(--merron-red);
+            box-shadow: 0 0 10px rgba(220, 38, 38, 0.4);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #9ca3af;
+        }
+
+        .status-text {
+            font-weight: 600;
+            color: var(--merron-text);
+            font-size: 1.1rem;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1;
+                box-shadow: 0 0 10px rgba(220, 38, 38, 0.4);
+            }
+            50% { 
+                opacity: 0.7;
+                box-shadow: 0 0 20px rgba(220, 38, 38, 0.6);
+            }
+        }
+
+        /* Update Section */
+        .update-section {
+            margin-top: 2rem;
+            padding: 1.75rem;
+            background: var(--merron-off-white);
+            border-radius: var(--radius);
+            border: 1px solid var(--merron-light-gray);
+        }
+
+        .progress-container {
+            margin-top: 1.5rem;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .progress-label {
+            font-weight: 600;
+            color: var(--merron-text);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .progress-percentage {
+            font-weight: 800;
+            color: var(--merron-red);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.5rem;
+        }
+
+        .progress-bar {
+            height: 12px;
+            background: var(--merron-light-gray);
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--merron-red) 0%, var(--merron-accent) 100%);
+            border-radius: 6px;
+            width: 0%;
+            transition: width 0.5s ease;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0.3) 50%, 
+                transparent 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Book Animation */
+        .book-animation {
+            display: none;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(220, 38, 38, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+            border-radius: var(--radius);
+            border: 1px solid rgba(220, 38, 38, 0.2);
+        }
+
+        .book {
+            width: 50px;
+            height: 65px;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: rotateY(-20deg);
+            animation: bookOpenClose 3s ease-in-out infinite;
+        }
+
+        .book-cover {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--merron-red) 0%, var(--merron-dark-red) 100%);
+            transform-origin: left center;
+            border-radius: 4px 8px 8px 4px;
+            box-shadow: -5px 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-pages {
+            position: absolute;
+            width: 95%;
+            height: 95%;
+            left: 2.5%;
+            top: 2.5%;
+            background: var(--merron-white);
+            transform-origin: left center;
+            border-radius: 2px 6px 6px 2px;
+            overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+        }
+
+        .book-page {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--merron-white);
+            transform-origin: left center;
+        }
+
+        @keyframes bookOpenClose {
+            0%, 100% { transform: rotateY(-20deg); }
+            50% { transform: rotateY(-160deg); }
+        }
+
+        .book-text {
+            font-size: 1rem;
+            color: var(--merron-text);
+        }
+
+        .book-text strong {
+            color: var(--merron-red);
+            font-size: 1.1rem;
+        }
+
+        /* Preview Table */
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            border: 1px solid var(--merron-light-gray);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .preview-table th {
+            background: var(--merron-off-white);
+            padding: 1.25rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--merron-text);
+            border-bottom: 2px solid var(--merron-red);
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .preview-table td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--merron-light-gray);
+            color: var(--merron-text);
+        }
+
+        .preview-table tr:hover {
+            background: rgba(220, 38, 38, 0.05);
+        }
+
+        .preview-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Summary */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .summary-item {
+            padding: 2rem;
+            background: var(--merron-white);
+            border-radius: var(--radius);
+            text-align: center;
+            border: 1px solid var(--merron-light-gray);
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .summary-item:hover {
+            border-color: var(--merron-red);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--merron-red);
+            margin-bottom: 0.75rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: var(--merron-text-light);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .branch-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .branch-item {
+            padding: 1rem;
+            background: var(--merron-off-white);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--merron-light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .branch-item:hover {
+            border-color: var(--merron-red);
+            transform: translateX(5px);
+        }
+
+        .branch-name {
+            color: var(--merron-text);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .branch-count {
+            font-weight: 800;
+            color: var(--merron-red);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.1rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            transform: translateX(400px);
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            max-width: 400px;
+            border-left: 4px solid var(--merron-red);
+            background: var(--merron-white);
+            border: 1px solid var(--merron-light-gray);
+            color: var(--merron-text);
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-success {
+            border-left-color: #10b981;
+        }
+
+        .toast-error {
+            border-left-color: var(--merron-red);
+        }
+
+        .toast-warning {
+            border-left-color: #f59e0b;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        /* Helper Classes */
+        .hidden {
+            display: none;
+        }
+
+        .text-red {
+            color: var(--merron-red);
+        }
+
+        .text-white {
+            color: var(--merron-white);
+        }
+
+        .text-gray {
+            color: var(--merron-text-light);
+        }
+
+        .mb-1 { margin-bottom: 1rem; }
+        .mb-2 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 1rem; }
+        .mt-2 { margin-top: 2rem; }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--merron-white);
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid var(--merron-light-gray);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--merron-text);
+            font-size: 1.5rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--merron-text-light);
+            font-size: 1.75rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--merron-red);
+        }
+
+        .requirements-list {
+            list-style: none;
+            margin: 1.5rem 0;
+        }
+
+        .requirements-list li {
+            padding: 1rem;
+            border-bottom: 1px solid var(--merron-light-gray);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--merron-text);
+        }
+
+        .requirements-list li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div>
+                    <h1>Raack Sync Pro</h1>
+                    <p class="subtitle">Enterprise Data Integration Platform • Google Sheets Automation</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value" id="totalRows">0</div>
+                <div class="stat-label">Total Records</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalBranches">0</div>
+                <div class="stat-label">Active Branches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">7</div>
+                <div class="stat-label">Status Categories</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="connectionStatus">●</div>
+                <div class="stat-label">Connection Status</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Upload Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-file-import"></i> Data Import</h2>
+                </div>
+                <div class="card-body">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text">
+                            <strong>Drop your data file here</strong>
+                            <p>or click to select from device</p>
+                        </div>
+                        <p class="text-gray" style="margin-bottom: 1.5rem; font-size: 0.95rem;">
+                            Supported formats: .xlsx, .xls, .csv
+                        </p>
+                        <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open"></i> Browse Files
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls,.csv">
+                    </div>
+
+                    <div class="file-info hidden" id="fileInfo">
+                        <h4><i class="fas fa-file-excel text-red"></i> File Details</h4>
+                        <p><strong>File:</strong> <span id="fileName" class="text-gray">-</span></p>
+                        <p><strong>Records:</strong> <span id="rowCount" class="text-red">0</span></p>
+                        <p><strong>Upload Time:</strong> <span id="uploadTime" class="text-gray">-</span></p>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="uploadBtn" onclick="uploadFile()" disabled>
+                            <i class="fas fa-upload"></i> Process File
+                        </button>
+                        <button class="btn btn-danger" id="clearBtn" onclick="clearFile()" disabled>
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processing Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fas fa-cogs"></i> Data Processing</h2>
+                </div>
+                <div class="card-body">
+                    <div class="connection-status">
+                        <div class="status-content">
+                            <div class="status-dot" id="statusDot"></div>
+                            <span class="status-text" id="statusText">Checking connection...</span>
+                        </div>
+                        <button class="btn btn-secondary" onclick="checkConnection()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+
+                    <div class="update-section">
+                        <div class="progress-header">
+                            <div class="progress-label">
+                                <i class="fas fa-sync-alt text-red"></i>
+                                <span>Processing Progress</span>
+                            </div>
+                            <div class="progress-percentage" id="progressPercentage">0%</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        
+                        <div class="book-animation hidden" id="bookAnimation">
+                            <div class="book">
+                                <div class="book-cover"></div>
+                                <div class="book-pages">
+                                    <div class="book-page"></div>
+                                </div>
+                            </div>
+                            <div class="book-text">
+                                <strong>Processing Data...</strong><br>
+                                Organizing data by status and branch
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="processBtn" onclick="showOptionModal()" disabled>
+                            <i class="fas fa-play"></i> Process Data
+                        </button>
+                        <button class="btn btn-secondary" onclick="showRequirementsModal()">
+                            <i class="fas fa-question-circle"></i> Requirements
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Card -->
+            <div class="card hidden" id="previewCard">
+                <div class="card-header">
+                    <h2><i class="fas fa-table"></i> Data Preview</h2>
+                </div>
+                <div class="card-body">
+                    <p class="text-gray mb-1">
+                        <i class="fas fa-eye"></i> First 10 records preview
+                    </p>
+                    <div style="overflow-x: auto; border-radius: var(--radius);">
+                        <table class="preview-table" id="previewTable">
+                            <!-- Table will be populated by JavaScript -->
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="card hidden" id="summaryCard">
+                <div class="card-header">
+                    <h2><i class="fas fa-chart-pie"></i> Processing Summary</h2>
+                </div>
+                <div class="card-body">
+                    <div class="summary-grid" id="summaryGrid">
+                        <!-- Summary will be populated here -->
+                    </div>
+                    
+                    <div class="mt-2" id="branchDetails">
+                        <!-- Branch details will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Requirements Modal -->
+    <div class="modal" id="requirementsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-list-check text-red"></i> Required Columns</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <p class="text-gray" style="margin-bottom: 1.5rem;">
+                Your data file must include these exact column names:
+            </p>
+            <ul class="requirements-list">
+                <li><i class="fas fa-check-circle text-red"></i> Branch Name</li>
+                <li><i class="fas fa-check-circle text-red"></i> order status</li>
+                <li><i class="fas fa-check-circle text-red"></i> Bill No</li>
+                <li><i class="fas fa-check-circle text-red"></i> Total Bill Amount</li>
+                <li><i class="fas fa-check-circle text-red"></i> Total Discount Amount</li>
+                <li><i class="fas fa-check-circle text-red"></i> Total Tax Amount</li>
+                <li><i class="fas fa-check-circle text-red"></i> Net Amount</li>
+            </ul>
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="closeModal()">
+                    <i class="fas fa-check"></i> Understood
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Option Selection Modal -->
+    <div class="modal" id="optionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-cogs text-red"></i> Processing Options</h3>
+                <button class="modal-close" onclick="closeOptionModal()">&times;</button>
+            </div>
+            <p class="text-gray" style="margin-bottom: 2rem;">
+                Choose how you want to process the uploaded data:
+            </p>
+            <div class="option-buttons" style="display: flex; flex-direction: column; gap: 1rem;">
+                <button class="btn btn-primary" onclick="selectOption('google_sheets')" style="justify-content: flex-start; text-align: left; padding: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <i class="fab fa-google-drive fa-2x"></i>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.1rem;">Upload to Google Sheets</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Update existing Google Sheets with unique records</div>
+                        </div>
+                    </div>
+                </button>
+                <button class="btn btn-secondary" onclick="selectOption('download_zip')" style="justify-content: flex-start; text-align: left; padding: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <i class="fas fa-file-archive fa-2x"></i>
+                        <div>
+                            <div style="font-weight: 700; font-size: 1.1rem;">Download ZIP Files</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Get Excel files organized by status and branch</div>
+                        </div>
+                    </div>
+                </button>
+            </div>
+            <div class="action-buttons" style="margin-top: 2rem;">
+                <button class="btn btn-danger" onclick="closeOptionModal()">
+                    <i class="fas fa-times"></i> Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedData = null;
+        let uploadTime = null;
+        let syncInterval = null;
+
+        // DOM Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const processBtn = document.getElementById('processBtn');
+        const previewCard = document.getElementById('previewCard');
+        const summaryCard = document.getElementById('summaryCard');
+        const toast = document.getElementById('toast');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const totalRowsElement = document.getElementById('totalRows');
+        const totalBranchesElement = document.getElementById('totalBranches');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const bookAnimation = document.getElementById('bookAnimation');
+        const requirementsModal = document.getElementById('requirementsModal');
+        const optionModal = document.getElementById('optionModal');
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkConnection();
+            setupDragAndDrop();
+            showToast('DataSync Pro initialized. Ready for data import.', 'success');
+        });
+
+        // Drag and Drop Setup
+        function setupDragAndDrop() {
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, () => {
+                    uploadArea.classList.remove('dragover');
+                }, false);
+            });
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                handleFileSelect();
+            }
+        }
+
+        // File Input Change
+        fileInput.addEventListener('change', handleFileSelect);
+
+        function handleFileSelect() {
+            const file = fileInput.files[0];
+            if (!file) return;
+
+            if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
+                showToast('Please select an Excel or CSV file', 'error');
+                return;
+            }
+
+            document.getElementById('fileName').textContent = file.name;
+            uploadTime = new Date().toLocaleTimeString();
+            document.getElementById('uploadTime').textContent = uploadTime;
+            fileInfo.classList.remove('hidden');
+            uploadBtn.disabled = false;
+            clearBtn.disabled = false;
+            showToast(`File "${file.name}" loaded successfully`, 'success');
+        }
+
+        // Upload File to Server
+        async function uploadFile() {
+            const file = fileInput.files[0];
+            if (!file) {
+                showToast('Please select a file first', 'error');
+                return;
+            }
+
+            showProgress(20);
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    uploadedData = result;
+                    document.getElementById('rowCount').textContent = result.rows;
+                    totalRowsElement.textContent = result.rows;
+                    
+                    // Count unique branches
+                    const branches = new Set();
+                    if (result.preview) {
+                        result.preview.forEach(row => {
+                            if (row['Branch Name']) branches.add(row['Branch Name']);
+                        });
+                    }
+                    totalBranchesElement.textContent = branches.size;
+                    
+                    showPreview(result.preview);
+                    processBtn.disabled = false;
+                    showProgress(40);
+                    showToast(`✅ ${result.rows} records processed successfully`, 'success');
+                } else {
+                    if (result.error && result.error.includes('Missing columns')) {
+                        showToast('Missing required columns in the file', 'error');
+                        showRequirementsModal();
+                    } else {
+                        showToast(result.error || 'Upload failed', 'error');
+                    }
+                }
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
+            } finally {
+                setTimeout(() => showProgress(0), 1000);
+            }
+        }
+
+        // Show Data Preview
+        function showPreview(data) {
+            if (!data || data.length === 0) {
+                showToast('No data to preview', 'warning');
+                return;
+            }
+
+            previewCard.classList.remove('hidden');
+            const table = document.getElementById('previewTable');
+            table.innerHTML = '';
+
+            // Create headers from first row keys
+            const headers = Object.keys(data[0]);
+            let headerRow = '<tr>';
+            headers.forEach(header => {
+                headerRow += `<th>${header}</th>`;
+            });
+            headerRow += '</tr>';
+            table.innerHTML = headerRow;
+
+            // Add data rows
+            data.forEach(row => {
+                let rowHtml = '<tr>';
+                headers.forEach(header => {
+                    let cellValue = row[header];
+                    if (cellValue === null || cellValue === undefined) cellValue = '';
+                    rowHtml += `<td>${cellValue}</td>`;
+                });
+                rowHtml += '</tr>';
+                table.innerHTML += rowHtml;
+            });
+        }
+
+        // Show Option Modal
+        function showOptionModal() {
+            optionModal.style.display = 'flex';
+        }
+
+        // Close Option Modal
+        function closeOptionModal() {
+            optionModal.style.display = 'none';
+        }
+
+        // Handle option selection
+        async function selectOption(option) {
+            closeOptionModal();
+            
+            if (!uploadedData) {
+                showToast('Please upload a file first', 'error');
+                return;
+            }
+
+            // Start book animation
+            bookAnimation.classList.remove('hidden');
+            showProgress(20);
+            
+            // Simulate progress updates
+            const progressSteps = [30, 45, 60, 75, 85, 95, 100];
+            let step = 0;
+            
+            syncInterval = setInterval(() => {
+                if (step < progressSteps.length) {
+                    showProgress(progressSteps[step]);
+                    step++;
+                }
+            }, 500);
+
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+            try {
+                const response = await fetch('/process-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ option: option })
+                });
+
+                const result = await response.json();
+
+                clearInterval(syncInterval);
+                showProgress(100);
+                
+                if (response.ok && result.success) {
+                    if (option === 'google_sheets') {
+                        // Handle Google Sheets update response
+                        showSummary(result);
+                        bookAnimation.classList.add('hidden');
+                        showToast('✅ Data synchronized with Google Sheets!', 'success');
+                    } else if (option === 'download_zip') {
+                        // Handle ZIP download
+                        bookAnimation.classList.add('hidden');
+                        showZipSummary(result);
+                        
+                        // Automatically trigger download
+                        setTimeout(() => {
+                            window.location.href = `/download-zip/${result.zip_filename}`;
+                            showToast('📥 ZIP file download started!', 'success');
+                        }, 1000);
+                    }
+                } else {
+                    bookAnimation.classList.add('hidden');
+                    showToast(result.error || 'Processing failed', 'error');
+                }
+            } catch (error) {
+                clearInterval(syncInterval);
+                bookAnimation.classList.add('hidden');
+                showToast('Network error: ' + error.message, 'error');
+            } finally {
+                setTimeout(() => showProgress(0), 2000);
+                processBtn.disabled = false;
+                processBtn.innerHTML = '<i class="fas fa-play"></i> Process Data';
+            }
+        }
+
+        // Show ZIP download summary
+        function showZipSummary(result) {
+            summaryCard.classList.remove('hidden');
+            const summaryGrid = document.getElementById('summaryGrid');
+            const branchDetails = document.getElementById('branchDetails');
+
+            summaryGrid.innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-value">${result.total_records || 0}</div>
+                    <div class="summary-label">Total Records</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${result.status_count || 0}</div>
+                    <div class="summary-label">Status Folders</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${result.zip_filename ? '📦' : '-'}</div>
+                    <div class="summary-label">ZIP File</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${new Date().toLocaleTimeString()}</div>
+                    <div class="summary-label">Generated</div>
+                </div>
+            `;
+
+            if (result.status_summary) {
+                let branchHtml = '<h4 style="color: var(--merron-text); margin-bottom: 1.5rem; font-family: \'Montserrat\', sans-serif;"><i class="fas fa-folder-open text-red"></i> Files in ZIP</h4>';
+                branchHtml += '<div class="branch-list">';
+                
+                for (const [status, count] of Object.entries(result.status_summary)) {
+                    branchHtml += `
+                        <div class="branch-item">
+                            <span class="branch-name">${status}.xlsx</span>
+                            <span class="branch-count">${count} records</span>
+                        </div>
+                    `;
+                }
+                branchHtml += '</div>';
+                branchDetails.innerHTML = branchHtml;
+            }
+        }
+
+        // Show Summary for Google Sheets
+        function showSummary(result) {
+            summaryCard.classList.remove('hidden');
+            const summaryGrid = document.getElementById('summaryGrid');
+            const branchDetails = document.getElementById('branchDetails');
+
+            summaryGrid.innerHTML = `
+                <div class="summary-item">
+                    <div class="summary-value">${result.rows_updated || 0}</div>
+                    <div class="summary-label">Records Added</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${Object.keys(result.summary || {}).length}</div>
+                    <div class="summary-label">Status Types</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${result.date || '-'}</div>
+                    <div class="summary-label">Sync Date</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-value">${result.time || '-'}</div>
+                    <div class="summary-label">Sync Time</div>
+                </div>
+            `;
+
+            if (result.summary) {
+                let branchHtml = '<h4 style="color: var(--merron-text); margin-bottom: 1.5rem; font-family: \'Montserrat\', sans-serif;"><i class="fas fa-sitemap text-red"></i> Branch Distribution</h4>';
+                branchHtml += '<div class="branch-list">';
+                
+                for (const [status, branches] of Object.entries(result.summary)) {
+                    if (Object.keys(branches).length > 0) {
+                        branchHtml += `<div style="color: var(--merron-text); margin-bottom: 1rem; font-weight: 700; background: var(--merron-off-white); padding: 0.75rem; border-radius: var(--radius-sm); border-left: 4px solid var(--merron-red);">${status}</div>`;
+                        for (const [branch, count] of Object.entries(branches)) {
+                            branchHtml += `
+                                <div class="branch-item">
+                                    <span class="branch-name">${branch}</span>
+                                    <span class="branch-count">${count}</span>
+                                </div>
+                            `;
+                        }
+                    }
+                }
+                branchHtml += '</div>';
+                branchDetails.innerHTML = branchHtml;
+            }
+        }
+
+        // Show Progress
+        function showProgress(percentage) {
+            progressFill.style.width = percentage + '%';
+            progressPercentage.textContent = percentage + '%';
+        }
+
+        // Check Google Sheets Connection
+        async function checkConnection() {
+            statusText.textContent = 'Checking connection...';
+            statusDot.className = 'status-dot';
+            connectionStatus.textContent = '●';
+            connectionStatus.style.color = '#9ca3af';
+
+            try {
+                const response = await fetch('/check-google-sheets');
+                const result = await response.json();
+
+                if (result.accessible) {
+                    statusDot.className = 'status-dot connected';
+                    statusText.textContent = 'Connected to Google Sheets';
+                    connectionStatus.textContent = '●';
+                    connectionStatus.style.color = 'var(--merron-red)';
+                    showToast('✅ Connected to Google Sheets', 'success');
+                } else {
+                    statusDot.className = 'status-dot disconnected';
+                    statusText.textContent = 'Connection failed';
+                    connectionStatus.textContent = '●';
+                    connectionStatus.style.color = '#9ca3af';
+                    showToast('❌ Cannot connect to Google Sheets', 'error');
+                }
+            } catch (error) {
+                statusDot.className = 'status-dot disconnected';
+                statusText.textContent = 'Connection error';
+                connectionStatus.textContent = '●';
+                connectionStatus.style.color = '#9ca3af';
+                showToast('Network error: ' + error.message, 'error');
+            }
+        }
+
+        // Clear Uploaded File
+        function clearFile() {
+            fileInput.value = '';
+            uploadedData = null;
+            fileInfo.classList.add('hidden');
+            previewCard.classList.add('hidden');
+            summaryCard.classList.add('hidden');
+            uploadBtn.disabled = true;
+            clearBtn.disabled = true;
+            processBtn.disabled = true;
+            showProgress(0);
+            showToast('File cleared', 'warning');
+        }
+
+        // Toast Notification
+        function showToast(message, type = 'info') {
+            toast.textContent = message;
+            toast.className = `toast toast-${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 5000);
+        }
+
+        // Modal Functions
+        function showRequirementsModal() {
+            requirementsModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            requirementsModal.style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (event) => {
+            if (event.target === requirementsModal) {
+                closeModal();
+            }
+            if (event.target === optionModal) {
+                closeOptionModal();
+            }
+        });
+    </script>
+</body>
+</html>
